@@ -5,21 +5,41 @@
         <q-img src="src/media/logo.png" style="height: 230px; max-width: 230px"></q-img>
         <h5 class="text-h5 q-mb-xs q-mt-lg text-black oswald">Добро пожаловать в EcoMap!</h5>
         <p class="q-mb-none text-subtitle2 text-black oswald" style="font-weight: 400">
-          Войдите в свой аккаунт
+          Создайте аккаунт
         </p>
         <form class="q-my-lg column">
-          <p class="text-subtitle2 no-margin text-black oswald" style="font-weight: 400">
-            Почта или имя пользователя
-          </p>
+          <p class="text-subtitle2 no-margin text-black oswald" style="font-weight: 400">Почта</p>
           <q-input
-            class="q-mx-sm q-mt-sm q-mb-lg"
+            class="q-ma-sm"
             style="border-color: rgb(133, 133, 133)"
             standout="bg-green-4 text-white"
             rounded
             v-model="userName"
             placeholder="example@gmail.com"
           ></q-input>
-          <p class="text-subtitle2 no-margin text-black oswald" style="font-weight: 400">Пароль</p>
+          <p class="text-subtitle2 no-margin text-black oswald" style="font-weight: 400">
+            Имя пользователя
+          </p>
+          <q-input
+            class="q-ma-sm"
+            style="border-color: rgb(133, 133, 133)"
+            standout="bg-green-4 text-white"
+            rounded
+            v-model="userName"
+            placeholder="Имя пользователя"
+          ></q-input>
+          <p class="text-subtitle2 no-margin text-black oswald" style="font-weight: 400">Школа</p>
+          <q-input
+            class="q-ma-sm"
+            style="border-color: rgb(133, 133, 133)"
+            standout="bg-green-4 text-white"
+            rounded
+            v-model="userName"
+            placeholder="Выберите из списка"
+          >
+            <template #append> <q-btn icon="menu" round flat /> </template
+          ></q-input>
+          <p class="text-subtitle2 q-ma-none text-black oswald" style="font-weight: 400">Пароль</p>
           <q-input
             class="q-ma-sm"
             standout="bg-green-4 text-white"
@@ -36,22 +56,13 @@
               />
             </template>
           </q-input>
-          <div class="fit row wrap justify-between items-start content-start q-my-md">
-            <q-checkbox
-              v-model="rememberUser"
-              label="Запомнить меня"
-              class="text-black oswald"
-              color="green-8"
-            />
-            <q-btn flat no-caps class="oswald" color="green-8">Забыли пароль?</q-btn>
-          </div>
           <q-btn
             no-caps
             color="green-10"
-            class="self-center oswald"
+            class="self-center oswald q-mt-lg"
             style="width: 60vw"
             @click="onLogin()"
-            >Войти</q-btn
+            >Зарегистрироваться</q-btn
           >
           <q-dialog v-model="isError">
             <q-card>
@@ -70,14 +81,9 @@
           </q-dialog>
         </form>
         <div class="row flex-center text-center">
-          <p class="text-subtitle1 text-black oswald self-center public-sans">Ещё нет аккаунта?</p>
-          <q-btn
-            flat
-            no-caps
-            to="/register"
-            class="self-center oswald text-subtitle1 text-center"
-            color="green-8"
-            >Создать аккаунт</q-btn
+          <p class="text-subtitle1 text-black oswald self-center public-sans">Уже есть аккаунт?</p>
+          <q-btn flat no-caps class="self-center oswald text-subtitle1 text-center" color="green-8"
+            >Войти в аккаунт</q-btn
           >
         </div>
         <!-- <div class="row flex-center">
@@ -152,7 +158,6 @@ import { useRouter } from 'vue-router';
 
 const userName = ref();
 const userPassword = ref();
-const rememberUser = ref();
 // const isDataValid = ref(true)
 const isPasswordVisible = ref(true);
 const errorMessage = ref('');
