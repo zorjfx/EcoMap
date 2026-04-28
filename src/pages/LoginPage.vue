@@ -56,7 +56,7 @@
           <q-dialog v-model="isError">
             <q-card>
               <q-card-section>
-                <div class="text-h6 public-sans">Something went wrong...</div>
+                <div class="text-h6 public-sans">Что-то пошло не так...</div>
               </q-card-section>
 
               <q-card-section class="q-pt-none public-sans">
@@ -160,8 +160,42 @@ const router = useRouter();
 const isError = ref(false);
 const authStore = useAuthStore();
 
+import axios from 'axios';
+import { authService } from 'src/api/authAPI';
+
 async function onLogin() {
-  await router.replace('/');
-  authStore.login();
+  errorMessage.value = '';
+  isError.value = false;
+
+  if (!userName.value || !userPassword.value) {
+    errorMessage.value = 'Введите почту и пароль';
+    isError.value = true;
+    return;
+  }
+
+  try {
+    const res = await authService.signIn(userName.value, userPassword.value);
+
+    authStore.setAuth({
+      accessToken: res.access_token,
+      user: res.user,
+    });
+
+    await router.replace({ name: 'map' });
+  } catch (err: unknown) {
+    console.error(err);
+
+    if (axios.isAxiosError(err)) {
+      console.log(err.response?.data);
+      errorMessage.value =
+        err.response?.data?.error_description || err.response?.data?.error || 'Ошибка входа';
+    } else if (err instanceof Error) {
+      errorMessage.value = err.message;
+    } else {
+      errorMessage.value = 'Неизвестная ошибка';
+    }
+
+    isError.value = true;
+  }
 }
 </script>

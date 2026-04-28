@@ -1,6 +1,6 @@
 <template>
   <q-card class="leaderboard-card no-shadow">
-    <div class="place-block flex flex-center">
+    <div class="place-block bg-green-8 flex flex-center">
       {{ place }}
     </div>
 
@@ -59,7 +59,6 @@ withDefaults(
 
 .place-block {
   width: 82px;
-  background: #4e8a86;
   color: white;
   font-size: 42px;
   font-weight: 700;

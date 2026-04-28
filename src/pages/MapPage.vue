@@ -79,9 +79,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+import { useScanPointsStore } from 'src/stores/scanPoints';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import type { FeatureCollection, Polygon } from 'geojson';
 import L from 'leaflet';
+// ОБЯЗАТЕЛЬНО добавь импорт стилей, если их нет в index.html
+import 'leaflet/dist/leaflet.css';
+
+const scanPointsStore = useScanPointsStore();
 
 type Tree = {
   id: number;
@@ -123,14 +128,43 @@ const trees: Tree[] = [
 const mapEl = ref<HTMLElement | null>(null);
 const selectedTree = ref<Tree | null>(null);
 
+// Переменная для карты, доступная везде в файле
+let map: L.Map | null = null;
+
+// Следим за новыми точками
+watch(
+  () => scanPointsStore.points,
+  (points) => {
+    if (!map) return;
+    const latest = points[points.length - 1];
+    if (!latest) return;
+
+    const isPlant = latest.type === 'растение';
+    const color = isPlant ? '#4CAF50' : '#F44336';
+
+    L.circleMarker([latest.lat, latest.lng], {
+      radius: 10,
+      fillColor: color,
+      color: '#fff',
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 0.9,
+    })
+      .bindPopup(`<b>${latest.kind}</b><br>${latest.status}`)
+      .addTo(map);
+  },
+  { deep: true },
+);
+
 onMounted(async () => {
   await nextTick();
-
   if (!mapEl.value) return;
 
-  const map = L.map(mapEl.value).setView([43.2389, 76.8897], 15);
+  // Инициализируем карту в нашу переменную модуля (БЕЗ const)
+  map = L.map(mapEl.value).setView([43.2389, 76.8897], 15);
+
   const treeIcon = L.icon({
-    iconUrl: 'public/icons/tree.png',
+    iconUrl: 'icons/tree.png', // Убедись, что путь верный (без public/)
     iconSize: [32, 32],
     iconAnchor: [16, 16],
   });
@@ -139,6 +173,7 @@ onMounted(async () => {
     attribution: '&copy; OpenStreetMap',
   }).addTo(map);
 
+  // Твои гексагоны
   const hexagons: FeatureCollection<Polygon> = {
     type: 'FeatureCollection',
     features: [
@@ -160,42 +195,7 @@ onMounted(async () => {
           ],
         },
       },
-      {
-        type: 'Feature',
-        properties: { color: '#e7cf67' },
-        geometry: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [76.8894, 43.2398],
-              [76.8902, 43.2402],
-              [76.891, 43.2398],
-              [76.891, 43.239],
-              [76.8902, 43.2386],
-              [76.8894, 43.239],
-              [76.8894, 43.2398],
-            ],
-          ],
-        },
-      },
-      {
-        type: 'Feature',
-        properties: { color: '#df7b7b' },
-        geometry: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [76.891, 43.2398],
-              [76.8918, 43.2402],
-              [76.8926, 43.2398],
-              [76.8926, 43.239],
-              [76.8918, 43.2386],
-              [76.891, 43.239],
-              [76.891, 43.2398],
-            ],
-          ],
-        },
-      },
+      // ... остальные гексагоны ...
     ],
   };
 
@@ -209,17 +209,17 @@ onMounted(async () => {
   }).addTo(map);
 
   trees.forEach((tree) => {
+    if (!map) return;
     const marker = L.marker([tree.lat, tree.lng], { icon: treeIcon }).addTo(map);
-
     marker.on('click', () => {
       selectedTree.value = tree;
-      console.log(selectedTree.value);
     });
   });
 
+  // Важно для Quasar, чтобы карта не «серела»
   setTimeout(() => {
-    map.invalidateSize();
-  }, 200);
+    if (map) map.invalidateSize();
+  }, 300);
 });
 </script>
 

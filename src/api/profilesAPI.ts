@@ -7,4 +7,4 @@ export type PublicProfile = {
   avatar_url?: string;
 };
 
-export const usersApi = new CrudApi<PublicProfile>('public_profiles');
+export const profilesService = new CrudApi<PublicProfile>('public_profiles');
