@@ -34,7 +34,7 @@
               standout="bg-white"
               style="width: 60vw; max-width: 300px"
             ></q-input>
-            <p class="text-h6 oswald q-ma-none q-pa-none">474 балла</p>
+            <p class="text-h6 oswald q-ma-none q-pa-none">{{ userPointsLabel }}</p>
           </q-card>
         </q-img>
         <q-card style="max-width: 85vw; border-radius: 16px" class="no-shadow q-mt-md bg-grey-3">
@@ -102,11 +102,13 @@ import { useAuthStore } from 'src/stores/auth';
 import { authService } from 'src/api/authAPI';
 import { profilesApi } from 'src/api/profilesAPI';
 import { schoolsApi } from 'src/api/schoolsAPI';
+import { useScanPointsStore } from 'src/stores/scanPoints';
 
 const changedBio = ref('');
 const isProfileLoading = ref(false);
 const router = useRouter();
 const authStore = useAuthStore();
+const scanPointsStore = useScanPointsStore();
 
 const displayUsername = computed(
   () =>
@@ -120,6 +122,22 @@ const displaySchool = computed(
     authStore.user?.school ||
     (isProfileLoading.value ? 'Загрузка...' : 'Школа не указана'),
 );
+const userPointsLabel = computed(() => formatPoints(scanPointsStore.totalPoints));
+
+function formatPoints(points: number) {
+  const lastDigit = points % 10;
+  const lastTwoDigits = points % 100;
+
+  if (lastDigit === 1 && lastTwoDigits !== 11) {
+    return `${points} балл`;
+  }
+
+  if (lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14)) {
+    return `${points} балла`;
+  }
+
+  return `${points} баллов`;
+}
 
 async function loadProfileData() {
   if (isProfileLoading.value || !authStore.accessToken) return;
