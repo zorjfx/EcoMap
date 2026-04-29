@@ -16,12 +16,12 @@
               rounded
               standout
               disable
-              v-model="changedUsername"
+              :model-value="displayUsername"
               bg-color="green-2"
               color="white"
               label-color="black"
               class="q-mb-sm"
-              label="НевероятноеИмя"
+              label="Имя пользователя"
               style="width: 60vw; max-width: 300px"
             >
             </q-input>
@@ -31,8 +31,7 @@
               label-color="white"
               class="q-mb-md"
               square
-              standout
-              disable
+              standout="bg-white"
               style="width: 60vw; max-width: 300px"
             ></q-input>
             <p class="text-h6 oswald q-ma-none q-pa-none">474 балла</p>
@@ -81,7 +80,7 @@
               </div>
 
               <div class="column q-ml-md school-info">
-                <div class="text-h6">Невероятная МБУ СОШ</div>
+                <div class="text-h6">{{ displaySchool }}</div>
 
                 <div class="row items-center q-mt-sm">
                   <q-icon name="leaderboard" size="42px" />
@@ -98,11 +97,77 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { useAuthStore } from 'src/stores/auth';
+import { authService } from 'src/api/authAPI';
+import { profilesApi } from 'src/api/profilesAPI';
+import { schoolsApi } from 'src/api/schoolsAPI';
 
-const changedUsername = ref();
-const changedBio = ref();
+const changedBio = ref('');
+const isProfileLoading = ref(false);
 const router = useRouter();
+const authStore = useAuthStore();
+
+const displayUsername = computed(
+  () =>
+    authStore.username ||
+    authStore.user?.username ||
+    (isProfileLoading.value ? 'Загрузка...' : 'Пользователь'),
+);
+const displaySchool = computed(
+  () =>
+    authStore.school ||
+    authStore.user?.school ||
+    (isProfileLoading.value ? 'Загрузка...' : 'Школа не указана'),
+);
+
+async function loadProfileData() {
+  if (isProfileLoading.value || !authStore.accessToken) return;
+
+  isProfileLoading.value = true;
+
+  try {
+    let userId = authStore.user?.id;
+
+    if (!userId) {
+      const authUser = await authService.getUser(authStore.accessToken);
+
+      authStore.setAuth({
+        accessToken: authStore.accessToken,
+        user: authUser,
+      });
+
+      userId = authStore.user?.id;
+    }
+
+    if (!userId) return;
+
+    const profile = await profilesApi.getById(userId);
+    const schoolId = profile?.school_id || authStore.user?.schoolId;
+    let schoolName = authStore.school || authStore.user?.school || '';
+
+    if (schoolId && !schoolName) {
+      const school = await schoolsApi.getById(schoolId);
+      schoolName = school?.name ?? '';
+    }
+
+    authStore.setUser({
+      id: userId,
+      email: authStore.email || authStore.user?.email || '',
+      username: profile?.username || authStore.username || authStore.user?.username || '',
+      school: schoolName,
+      schoolId: schoolId ?? '',
+    });
+  } catch (error) {
+    console.error('Ошибка загрузки профиля', error);
+  } finally {
+    isProfileLoading.value = false;
+  }
+}
+
+onMounted(() => {
+  void loadProfileData();
+});
 
 async function goBack() {
   if (window.history.length > 1) {

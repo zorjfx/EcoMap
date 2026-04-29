@@ -2,40 +2,46 @@
   <q-layout>
     <q-page-container>
       <q-page class="column items-center">
-        <q-img src="src/media/logo.png" style="height: 230px; max-width: 230px"></q-img>
+        <q-img src="src/media/logo.png" style="height: 230px; max-width: 230px" />
+
         <h5 class="text-h5 q-mb-xs q-mt-lg text-black oswald">Добро пожаловать в EcoMap!</h5>
+
         <p class="q-mb-none text-subtitle2 text-black oswald" style="font-weight: 400">
           Создайте аккаунт
         </p>
-        <form class="q-my-lg column">
+
+        <form class="q-my-lg column" @submit.prevent="onRegister">
           <p class="text-subtitle2 no-margin text-black oswald" style="font-weight: 400">Почта</p>
+
           <q-input
             class="q-ma-sm"
-            style="border-color: rgb(133, 133, 133)"
             standout="bg-green-4 text-white"
             rounded
             v-model="userEmail"
             placeholder="example@gmail.com"
-          ></q-input>
+          />
+
           <p class="text-subtitle2 no-margin text-black oswald" style="font-weight: 400">
             Имя пользователя
           </p>
+
           <q-input
             class="q-ma-sm"
-            style="border-color: rgb(133, 133, 133)"
             standout="bg-green-4 text-white"
             rounded
             v-model="userName"
             placeholder="Имя пользователя"
-          ></q-input>
+          />
+
           <p class="text-subtitle2 no-margin text-black oswald" style="font-weight: 400">Школа</p>
+
           <q-input
             class="q-ma-sm"
-            style="border-color: rgb(133, 133, 133)"
             standout="bg-green-4 text-white"
             rounded
             v-model="userSchool"
             placeholder="Выберите из списка"
+            readonly
           >
             <template #append>
               <q-btn icon="menu" round flat>
@@ -64,9 +70,11 @@
                   </q-list>
                 </q-menu>
               </q-btn>
-            </template></q-input
-          >
+            </template>
+          </q-input>
+
           <p class="text-subtitle2 q-ma-none text-black oswald" style="font-weight: 400">Пароль</p>
+
           <q-input
             class="q-ma-sm"
             standout="bg-green-4 text-white"
@@ -75,7 +83,7 @@
             placeholder="........."
             :type="isPasswordVisible ? 'password' : 'text'"
           >
-            <template v-slot:append>
+            <template #append>
               <q-icon
                 :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
                 class="cursor-pointer"
@@ -83,14 +91,18 @@
               />
             </template>
           </q-input>
+
           <q-btn
             no-caps
             color="green-10"
             class="self-center oswald q-mt-lg"
             style="width: 60vw"
-            @click="onRegister()"
-            >Зарегистрироваться</q-btn
+            type="submit"
+            :loading="isLoading"
           >
+            Зарегистрироваться
+          </q-btn>
+
           <q-dialog v-model="isError">
             <q-card>
               <q-card-section>
@@ -102,106 +114,55 @@
               </q-card-section>
 
               <q-card-actions align="right">
-                <q-btn flat label="OK" color="green-6 public-sans" v-close-popup />
+                <q-btn flat label="OK" color="green-6" v-close-popup />
               </q-card-actions>
             </q-card>
           </q-dialog>
         </form>
+
         <div class="row flex-center text-center">
           <p class="text-subtitle1 text-black oswald self-center public-sans">Уже есть аккаунт?</p>
+
           <q-btn
             flat
             no-caps
-            to="login"
+            to="/login"
             class="self-center oswald text-subtitle1 text-center"
             color="green-8"
-            >Войти в аккаунт</q-btn
           >
-        </div>
-        <!-- <div class="row flex-center">
-          <div class="col">
-            <q-separator inset />
-          </div>
-          <div class="col text-center text-blue-grey-2 text-subtitle1 public-sans">Настройки</div>
-          <div class="col">
-            <q-separator inset />
-          </div>
-        </div>
-        <div class="self-center space evenly text-blue-grey-2">
-          <q-btn flat round class="q-mx-xs" style="font-size: 1em" icon="translate">
-            <q-menu
-              anchor="bottom end"
-              self="top end"
-              transition-show="jump-down"
-              transition-hide="jump-up"
-            >
-              <q-list>
-                <q-item clickable>
-                  <q-item-section>English</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Русский</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>Қазақ тілі</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
+            Войти в аккаунт
           </q-btn>
-          <q-btn flat round class="q-mx-xs" style="font-size: 1em" icon="contrast">
-            <q-menu
-              anchor="bottom start"
-              self="top start"
-              transition-show="jump-down"
-              transition-hide="jump-up"
-            >
-              <q-list>
-                <q-item clickable>
-                  <q-item-section avatar>
-                    <q-icon name="light_mode"></q-icon>
-                  </q-item-section>
-                  <q-item-section>Светлая тема</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section avatar>
-                    <q-icon name="dark_mode"></q-icon>
-                  </q-item-section>
-                  <q-item-section>Темная тема</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section avatar>
-                    <q-icon name="devices"></q-icon>
-                  </q-item-section>
-                  <q-item-section>Синхронизировать</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
-        </div> -->
+        </div>
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from 'src/stores/auth';
-import { schoolsApi, type School } from 'src/api/schoolsAPI';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { authService } from 'src/api/authAPI';
 import axios from 'axios';
 
-const userName = ref();
-const userPassword = ref();
-const userEmail = ref();
-const userSchool = ref();
-const selectedSchoolId = ref<string | null>(null);
-// const isDataValid = ref(true)
-const isPasswordVisible = ref(true);
-const errorMessage = ref('');
+import { useAuthStore } from 'src/stores/auth';
+import { schoolsApi, type School } from 'src/api/schoolsAPI';
+import { authService } from 'src/api/authAPI';
+import { profilesApi } from 'src/api/profilesAPI';
+
 const router = useRouter();
-const isError = ref(false);
 const authStore = useAuthStore();
+
+const userName = ref('');
+const userPassword = ref('');
+const userEmail = ref('');
+const userSchool = ref('');
+
+const selectedSchoolId = ref<string | null>(null);
+
+const isPasswordVisible = ref(true);
+const isError = ref(false);
+const isLoading = ref(false);
+const errorMessage = ref('');
+
 const schools = ref<School[]>([]);
 const isLoaded = ref(false);
 
@@ -213,6 +174,8 @@ const loadSchools = async () => {
     isLoaded.value = true;
   } catch (e) {
     console.error('Ошибка загрузки школ', e);
+    errorMessage.value = 'Не удалось загрузить список школ';
+    isError.value = true;
   }
 };
 
@@ -238,6 +201,8 @@ async function onRegister() {
   }
 
   try {
+    isLoading.value = true;
+
     const res = await authService.signUp({
       email: userEmail.value,
       password: userPassword.value,
@@ -245,11 +210,38 @@ async function onRegister() {
       school_id: selectedSchoolId.value,
     });
 
-    console.log(res);
+    console.log('REGISTER RESPONSE:', res);
+
+    if (!res.access_token) {
+      errorMessage.value = 'Регистрация прошла, но токен не был получен';
+      isError.value = true;
+      return;
+    }
+
+    const profile = await profilesApi.create(
+      {
+        id: res.user.id,
+        username: userName.value,
+        school_id: selectedSchoolId.value,
+      },
+      res.access_token,
+    );
+
+    if (!profile) {
+      errorMessage.value = 'Профиль пользователя не был создан';
+      isError.value = true;
+      return;
+    }
 
     authStore.setAuth({
       accessToken: res.access_token,
-      user: res.user,
+      user: {
+        id: res.user.id,
+        email: res.user.email ?? userEmail.value,
+        username: profile.username,
+        school: userSchool.value,
+        schoolId: profile.school_id,
+      },
     });
 
     await router.replace({ name: 'map' });
@@ -258,7 +250,10 @@ async function onRegister() {
 
     if (axios.isAxiosError(err)) {
       errorMessage.value =
-        err.response?.data?.error_description || err.response?.data?.error || 'Ошибка регистрации';
+        err.response?.data?.error_description ||
+        err.response?.data?.msg ||
+        err.response?.data?.error ||
+        'Ошибка регистрации';
     } else if (err instanceof Error) {
       errorMessage.value = err.message;
     } else {
@@ -266,6 +261,8 @@ async function onRegister() {
     }
 
     isError.value = true;
+  } finally {
+    isLoading.value = false;
   }
 }
 </script>
